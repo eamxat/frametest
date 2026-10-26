@@ -1547,7 +1547,7 @@
     // Lee un archivo JSON público (editable desde GitHub) y lo muestra con efecto fade.
     // Para cambiar el origen del anuncio basta con editar ANNOUNCEMENT_URL.
     (function () {
-        const ANNOUNCEMENT_URL = 'https://raw.githubusercontent.com/eamxat/Images/main/anuncio.json';
+        const ANNOUNCEMENT_URL = 'https://raw.githubusercontent.com/eamxat/frametest/main/anuncio.json';
         const REFRESH_MS = 5 * 60 * 1000;   // vuelve a consultar el archivo cada 5 minutos
         const DEFAULT_ROTATE_S = 7;         // segundos entre mensajes si hay varios
         const FADE_MS = 400;                // debe coincidir con la transición de #announcement-text
@@ -1617,9 +1617,22 @@
             box.setAttribute('aria-hidden', 'true');
         }
 
+        // Motivo por el que no se muestra (aparece en la consola del navegador, F12)
+        function why(cfg) {
+            if (!cfg || typeof cfg !== 'object') return 'el archivo no es un JSON válido (debe ser un objeto { ... })';
+            if (cfg.activo !== true) return '"activo" no es true (valor actual: ' + JSON.stringify(cfg.activo) + ')';
+            if (!inRange(cfg)) return 'hoy (' + today() + ') está fuera del rango "desde"/"hasta"';
+            return 'no hay mensajes válidos en "mensajes" (cada uno necesita "es" o "en" con texto)';
+        }
+
         function apply(cfg) {
             const next = normalize(cfg);
-            if (!next.length) { messages = []; hide(); return; }
+            if (!next.length) {
+                messages = [];
+                hide();
+                console.warn('[Anuncio] Archivo cargado, pero no se muestra: ' + why(cfg));
+                return;
+            }
             if (JSON.stringify(next) !== JSON.stringify(messages)) {
                 messages = next;
                 idx = 0;
@@ -1639,7 +1652,10 @@
             fetch(ANNOUNCEMENT_URL + '?t=' + Date.now(), { cache: 'no-store' })
                 .then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
                 .then(apply)
-                .catch(function () { /* sin archivo o sin red: el anuncio simplemente no se muestra */ });
+                .catch(function (err) {
+                    // Sin archivo o sin red: el anuncio simplemente no se muestra
+                    console.warn('[Anuncio] No se pudo leer ' + ANNOUNCEMENT_URL + ' -> ' + (err && err.message ? err.message : err));
+                });
         }
 
         // Cambio de idioma (EN/ES): se refresca el texto sin tocar el selector existente
