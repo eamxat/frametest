@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -423,14 +423,16 @@
 
     /* Iconos de los títulos */
     #section-details h2 img { filter: var(--icon-glow); }
-    #section-smilies h2 img {
+    #section-smilies h2 img,
+    #section-pawns h2 img {
         filter: brightness(0) invert(1);
-        opacity: 0.88;
+        opacity: 0.55;
     }
-    /* En tema claro el icono de Smilies pasa a negro */
-    html[data-theme="light"] #section-smilies h2 img {
+    /* En tema claro los iconos de Smilies y Pawns pasan a negro */
+    html[data-theme="light"] #section-smilies h2 img,
+    html[data-theme="light"] #section-pawns h2 img {
         filter: brightness(0);
-        opacity: 0.88;
+        opacity: 0.55;
     }
 
     /* Tarjetas de smilies */
@@ -648,9 +650,8 @@
         width: 18px;
         height: 18px;
         margin-top: 2px;
-        color: #ffd24d;
+        object-fit: contain;
     }
-    html[data-theme="light"] .ann .ann-icon { color: #a86f00; }
     html[data-theme="light"] .ann .ann-inner { box-shadow: inset 3px 0 0 #d9a81f; }
     #announcement-text {
         font-family: 'Poppins', ui-sans-serif, system-ui, sans-serif;
@@ -664,6 +665,74 @@
     #announcement-text.is-fading { opacity: 0; }
     @media (prefers-reduced-motion: reduce) {
         .ann, .ann.is-open, #announcement-text { transition: none; }
+    }
+
+    /* =====================================================================
+       BOTÓN "CERRAR ANUNCIO" (icono + tacha parpadeante, junto al botón de
+       tema). Va fuera del flujo: no mueve ningún elemento. Se oculta mientras
+       el panel de apariencia está abierto, para no estorbarlo.
+       ===================================================================== */
+    .ann-close {
+        position: absolute;
+        left: 100%;
+        top: 50%;
+        transform: translateY(-50%);
+        z-index: 2;
+        width: 20px;
+        height: 20px;
+        padding: 0;
+        margin: 0 0 0 8px;
+        border: 0;
+        background: transparent;
+        cursor: pointer;
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        transition: opacity .4s ease, visibility 0s linear .4s, transform .15s ease, filter .15s ease;
+    }
+    .ann-close.is-on {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+        transition: opacity .4s ease, visibility 0s, transform .15s ease, filter .15s ease;
+    }
+    .ann-close.ap-hide {
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+    }
+    .ann-close:hover { transform: translateY(-50%) scale(1.1); filter: brightness(1.2); }
+    .ann-close:active { transform: translateY(-50%) scale(0.95); }
+    .ann-close .ann-close-img {
+        display: block;
+        width: 20px;
+        height: 20px;
+        object-fit: contain;
+        pointer-events: none;
+    }
+    .ann-close .ann-close-x {
+        position: absolute;
+        top: -4px;
+        right: -4px;
+        width: 11px;
+        height: 11px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        color: #fff;
+        background: linear-gradient(180deg, #ff6b7d, #d62839);
+        box-shadow: 0 0 0 1px rgba(10, 10, 50, 0.55), 0 0 6px rgba(255, 70, 90, 0.55);
+        animation: ann-blink 1.1s ease-in-out infinite;
+        pointer-events: none;
+    }
+    @keyframes ann-blink {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.12; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .ann-close, .ann-close.is-on { transition: none; }
+        .ann-close .ann-close-x { animation: none; }
     }
   </style>
 </head>
@@ -710,7 +779,7 @@
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
                 </svg>
-                <span id="lang-indicator">EN</span>
+                <span id="lang-indicator">ES</span>
             </button>
 
             <!-- Botón de Apariencia (Light / Dark / Glass Opacity) -->
@@ -718,6 +787,11 @@
                 <button onclick="window.toggleAppearance(event)" id="top-btn-appearance" aria-haspopup="true" aria-expanded="false" data-i18n-title="appearance" title="Apariencia" class="px-2 py-1.5 bg-slate-800 border border-slate-700 rounded-lg text-xs font-bold text-slate-300 hover:text-white transition-all shadow-sm flex items-center justify-center cursor-pointer w-[34px]">
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3a9 9 0 100 18 2.25 2.25 0 002.25-2.25c0-.62-.25-1.19-.66-1.6a2.25 2.25 0 011.6-3.84H17a4 4 0 004-4C21 5.6 17 3 12 3z" /><circle cx="7.5" cy="11" r="1" fill="currentColor" stroke="none" /><circle cx="10" cy="7.5" r="1" fill="currentColor" stroke="none" /><circle cx="14.5" cy="7.5" r="1" fill="currentColor" stroke="none" /></svg>
                 </button>
+                <!-- Cerrar anuncio: junto al botón de tema; solo aparece mientras hay un anuncio abierto (posición absoluta: no desplaza nada) -->
+            <button type="button" id="ann-close-btn" class="ann-close" aria-label="Close announcement" data-i18n-title="close_announcement" title="Cerrar anuncio">
+                <img src="https://raw.githubusercontent.com/eamxat/Images/6c447ca322b75d2a2c26d004175b624913cc3929/anuncioicon.svg" alt="" class="ann-close-img">
+                <span class="ann-close-x" aria-hidden="true"><svg viewBox="0 0 10 10" width="7" height="7" fill="none"><path d="M2 2l6 6M8 2L2 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /></svg></span>
+            </button>
                 <div id="appearance-panel" class="hidden absolute left-full top-0 ml-2 z-50 rounded-xl" onclick="event.stopPropagation()">
                     <div class="ap-seg">
                         <button type="button" class="ap-opt" data-theme-opt="light" onclick="window.setTheme('light')">
@@ -776,7 +850,7 @@
                     <!-- ANUNCIO REMOTO (oculto hasta que exista un anuncio activo) -->
                     <div id="announcement" class="ann" aria-hidden="true" aria-live="polite">
                         <div class="ann-inner">
-                            <svg class="ann-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11v2a1 1 0 001 1h2l5 4V6L6 10H4a1 1 0 00-1 1z" /><path d="M15.5 8.5a5 5 0 010 7M18.5 5.5a9 9 0 010 13" /></svg>
+                            <img class="ann-icon" src="https://raw.githubusercontent.com/eamxat/Images/6c447ca322b75d2a2c26d004175b624913cc3929/anuncioicon.svg" alt="">
                             <span id="announcement-text"></span>
                         </div>
                     </div>
@@ -797,7 +871,7 @@
                                                     <img id="t-img" alt="Main Power" class="sprite-image hidden">
                                                 </div>
                                             </div>
-                                            <img src="https://raw.githubusercontent.com/eamxat/Images/738ce0e294d60e9c39f0d117c38fd5131797755d/Newicon.svg" alt="New icon" class="h-10 w-10 object-contain drop-shadow-[0_0_8px_rgba(255,255,255,0.1)]">
+                                            <img src="https://xat.com/content/web/R00243/img/navbar/new.svg" alt="New icon" class="h-10 w-10 object-contain drop-shadow-[0_0_8px_rgba(255,255,255,0.1)]">
                                         </div>
                                     </td>
                                 </tr>
@@ -875,7 +949,7 @@
                 <!-- Sección de Pawns -->
                 <section id="section-pawns" class="bg-slate-900 rounded-2xl shadow-2xl border border-slate-800 p-5 w-full h-[590px] hidden flex-col">
                     <h2 class="text-xl font-bold text-white mb-4 border-b border-slate-800 pb-3 flex items-center gap-3 shrink-0">
-                        <img src="https://s0.xat.com/web_gear/chat/GetStrip8.php?c=a_(p1pwn)_40" alt="Pawn icon" class="h-6 w-6 object-contain" style="image-rendering: auto;"> <span data-i18n="pawns">Pawns</span>
+                        <img src="https://raw.githubusercontent.com/eamxat/Images/6c447ca322b75d2a2c26d004175b624913cc3929/pawn.svg" alt="Pawn icon" class="h-6 w-6 object-contain" style="image-rendering: auto;"> <span data-i18n="pawns">Pawns</span>
                     </h2>
                     <div class="flex-1 w-full overflow-hidden">
                         <div id="pawns-grid" class="grid grid-cols-2 gap-3 content-start w-full"></div>
@@ -901,6 +975,7 @@
             search_copied: "¡Código copiado con éxito!",
             power_details: "Power Nuevo",
             appearance: "Apariencia",
+            close_announcement: "Cerrar anuncio",
             theme_light: "Claro",
             theme_dark: "Oscuro",
             glass_opacity: "Opacidad Glass",
@@ -937,6 +1012,7 @@
             search_copied: "Code copied successfully!",
             power_details: "New Power",
             appearance: "Appearance",
+            close_announcement: "Close announcement",
             theme_light: "Light",
             theme_dark: "Dark",
             glass_opacity: "Glass Opacity",
@@ -966,7 +1042,7 @@
     };
     
     // Estado del idioma
-    let currentLang = 'es';
+    let currentLang = 'en';
 
     window.updateTranslations = function() {
         document.querySelectorAll('[data-i18n]').forEach(el => {
@@ -1397,6 +1473,9 @@
         }
     }
 
+    // Idioma inicial (inglés): traduce los textos estáticos antes de cargar los datos
+    window.updateTranslations();
+
     cargarDatos();
 
     // --- PROTECCIÓN GLOBAL DE COPIA Y ANTI-DEVTOOLS ---
@@ -1517,11 +1596,13 @@
 
         const searchInput = document.getElementById('top-search');
         const searchWrap = searchInput ? searchInput.parentElement : null;
+        const annBtn = document.getElementById('ann-close-btn');
 
         function closePanel() {
             panel.classList.add('hidden');
             btn.setAttribute('aria-expanded', 'false');
             if (searchWrap) searchWrap.classList.remove('ap-hide');
+            if (annBtn) annBtn.classList.remove('ap-hide');
         }
 
         window.toggleAppearance = function (e) {
@@ -1529,6 +1610,7 @@
             const open = panel.classList.toggle('hidden') === false;
             btn.setAttribute('aria-expanded', open ? 'true' : 'false');
             if (searchWrap) searchWrap.classList.toggle('ap-hide', open);
+            if (annBtn) annBtn.classList.toggle('ap-hide', open);
         };
 
         document.addEventListener('click', closePanel);
@@ -1548,7 +1630,7 @@
     // Para cambiar el origen del anuncio basta con editar ANNOUNCEMENT_URL.
     (function () {
         const ANNOUNCEMENT_URL = 'https://raw.githubusercontent.com/eamxat/frametest/main/anuncio.json';
-        const REFRESH_MS = 5 * 60 * 1000;   // vuelve a consultar el archivo cada 5 minutos
+        const REFRESH_MS = 60 * 1000;       // vuelve a consultar el archivo cada minuto
         const DEFAULT_ROTATE_S = 7;         // segundos entre mensajes si hay varios
         const FADE_MS = 400;                // debe coincidir con la transición de #announcement-text
         const MAX_LEN = 220;                // límite de caracteres por mensaje
@@ -1556,9 +1638,11 @@
 
         const box = document.getElementById('announcement');
         const txt = document.getElementById('announcement-text');
+        const closeBtn = document.getElementById('ann-close-btn');
         if (!box || !txt) return;
 
         let messages = [];
+        let dismissedSig = null;   // anuncio cerrado por el usuario (solo durante esta visita)
         let idx = 0;
         let rotTimer = null;
 
@@ -1577,7 +1661,7 @@
 
         // Texto según el idioma activo (con respaldo al otro idioma). Solo texto plano.
         function pick(m) {
-            const lang = (typeof currentLang === 'string') ? currentLang : 'es';
+            const lang = (typeof currentLang === 'string') ? currentLang : 'en';
             const other = lang === 'es' ? 'en' : 'es';
             const v = m[lang] || m[other] || '';
             return typeof v === 'string' ? v.trim().slice(0, MAX_LEN) : '';
@@ -1615,6 +1699,7 @@
             stopRotation();
             box.classList.remove('is-open');
             box.setAttribute('aria-hidden', 'true');
+            if (closeBtn) closeBtn.classList.remove('is-on');
         }
 
         // Motivo por el que no se muestra (aparece en la consola del navegador, F12)
@@ -1629,20 +1714,25 @@
             const next = normalize(cfg);
             if (!next.length) {
                 messages = [];
+                dismissedSig = null;
                 hide();
                 console.warn('[Anuncio] Archivo cargado, pero no se muestra: ' + why(cfg));
                 return;
             }
-            if (JSON.stringify(next) !== JSON.stringify(messages)) {
+            const sig = JSON.stringify(next);
+            if (sig !== JSON.stringify(messages)) {
                 messages = next;
                 idx = 0;
                 setText();
             }
+            // Si el usuario lo cerró, sigue cerrado hasta que el contenido del anuncio cambie
+            if (sig === dismissedSig) { hide(); return; }
             const seconds = Number(cfg.intervalo) > 0 ? Number(cfg.intervalo) : DEFAULT_ROTATE_S;
             if (!box.classList.contains('is-open')) {
                 requestAnimationFrame(function () {
                     box.classList.add('is-open');
                     box.setAttribute('aria-hidden', 'false');
+                    if (closeBtn) closeBtn.classList.add('is-on');
                 });
             }
             startRotation(seconds);
@@ -1663,6 +1753,19 @@
         if (langInd && window.MutationObserver) {
             new MutationObserver(function () { setText(); })
                 .observe(langInd, { childList: true, characterData: true, subtree: true });
+        }
+
+        // Clic en el icono: cierra el anuncio
+        if (closeBtn) {
+            closeBtn.addEventListener('click', function () {
+                dismissedSig = JSON.stringify(messages);
+                hide();
+            });
+        }
+
+        // Al volver a la pestaña se consulta de inmediato (si el JSON pasó a false, el icono desaparece)
+        if (document.addEventListener) {
+            document.addEventListener('visibilitychange', function () { if (!document.hidden) load(); });
         }
 
         load();
