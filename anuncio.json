@@ -1,5 +1,5 @@
 {
-  "activo": false,
+  "activo": true,
   "intervalo": 7,
   "desde": "2026-10-25",
   "hasta": "2026-12-31",
