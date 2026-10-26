@@ -1,0 +1,16 @@
+{
+  "activo": false,
+  "intervalo": 7,
+  "desde": "2026-10-25",
+  "hasta": "2026-12-31",
+  "mensajes": [
+    {
+      "es": "¡Bienvenido a New Power! Aquí aparecerán los anuncios.",
+      "en": "Welcome to New Power! Announcements will appear here."
+    },
+    {
+      "es": "Segundo mensaje de ejemplo (se alterna con fade).",
+      "en": "Second sample message (rotates with a fade)."
+    }
+  ]
+}
