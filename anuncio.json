@@ -5,12 +5,12 @@
   "hasta": "2026-12-31",
   "mensajes": [
     {
-      "es": "¡Bienvenido a New Power! Aquí aparecerán los anuncios.",
+      "es": "beta.xat.com (¡en fase de pruebas!) - ¡Echa un vistazo a los CONCURSOS del foro! Tanto los de XAT como los de TRADE. ¡Que los disfrutes!",
       "en": "beta.xat.com (in testing!) - Check the forum’s CONTESTS! Both XAT’S and Trade’s, Enjoy!!"
     },
     {
-      "es": "Segundo mensaje de ejemplo (se alterna con fade).",
-      "en": "Second sample message (rotates with a fade)."
+      "es": "Bienvenido a xat trade. Intercambio de xats, poderes y días.",
+      "en": "Welcome to xat trade. Trading xats, powers and days."
     }
   ]
 }
